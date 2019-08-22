@@ -1,0 +1,40 @@
+{
+  "name": "jrnl",
+  "version": "1.0.0",
+  "description": "A CLI for managing my personal markdown-based journal",
+  "main": "bin/src/index.js",
+  "types": "bin/src/index.d.ts",
+  "files": [
+    "bin/src"
+  ],
+  "license": "GPL-3.0",
+  "keywords": [
+    "cli",
+    "jrnl"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "check": "gts check",
+    "clean": "gts clean",
+    "compile": "tsc -p .",
+    "fix": "gts fix",
+    "prepare": "npm run compile",
+    "pretest": "npm run compile",
+    "posttest": "npm run check"
+  },
+  "devDependencies": {
+    "gts": "^1.1.0",
+    "typescript": "~3.5.0",
+    "@types/node": "^10.0.3"
+  },
+  "bin": {
+    "jrnl": "bin/src/index.js"
+  },
+  "publishConfig": {
+    "access": "plublic"
+  },
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@github.com:matt-hoiland/jrnl.git"
+  }
+}
