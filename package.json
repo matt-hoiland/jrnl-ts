@@ -23,9 +23,10 @@
     "posttest": "npm run check"
   },
   "devDependencies": {
+    "@types/node": "^10.0.3",
+    "@types/yargs": "^13.0.2",
     "gts": "^1.1.0",
-    "typescript": "~3.5.0",
-    "@types/node": "^10.0.3"
+    "typescript": "~3.5.0"
   },
   "bin": {
     "jrnl": "bin/src/index.js"
@@ -36,5 +37,8 @@
   "repository": {
     "type": "git",
     "url": "ssh://git@github.com:matt-hoiland/jrnl.git"
+  },
+  "dependencies": {
+    "yargs": "^14.0.0"
   }
 }
