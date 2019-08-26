@@ -2,6 +2,7 @@
 
 import { argv, exit } from 'process';
 import * as yargs from 'yargs';
+import { createCommand } from './create';
 
 export function main(args: string[]) {
   console.log('Hello, World! It\'s a change!');
@@ -11,12 +12,13 @@ export function main(args: string[]) {
 if (require.main === module) {
   const argv = yargs
     .usage('$0 [-h] [-v|-q] [--version] <command> ...')
-    .command('create <title>', 'Create a new journal entry', yargs => {
-      return yargs.positional('title', {
-        desc: 'Title of the entry to be made',
-        type: 'string'
-      });
-    })
+    // .command('create <title>', 'Create a new journal entry', yargs => {
+    //   return yargs.positional('title', {
+    //     desc: 'Title of the entry to be made',
+    //     type: 'string'
+    //   });
+    // })
+    .command(createCommand)
     .command('list [--oneline]', 'List all existing entries', yargs => {
       return yargs.option('oneline', {
         desc: 'Use one line per entry',
