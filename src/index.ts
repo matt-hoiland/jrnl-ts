@@ -5,7 +5,7 @@ import * as yargs from 'yargs';
 import { createCommand } from './create';
 
 export function main(args: string[]) {
-  console.log('Hello, World! It\'s a change!');
+  console.log('Hello, World! It is a change!');
   return 0;
 }
 
