@@ -4,5 +4,9 @@
     "exclude": [
       "**/*.json"
     ]
+  },
+  "rules": {
+    "ban-ts-ignore": false,
+    "no-any": false
   }
 }
