@@ -1,0 +1,29 @@
+{
+  "title": "MetaData",
+  "type": "object",
+  "required": ["date", "file_name", "title"],
+  "additionalProperties": false,
+  "properties": {
+    "date": { "$ref": "#/definitions/ISOTime" },
+    "file_name": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "title": {
+      "type": "string"
+    }
+  },
+
+  "definitions": {
+    "ISOTime": {
+      "type": "string",
+      "pattern": "/^\\d{4}-[01]\\d-[0-3]\\dT[0-2]\\d:[0-5]\\dZ$"
+    }
+  }
+}
