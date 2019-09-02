@@ -16,7 +16,7 @@
     "test": "jasmine",
     "check": "gts check",
     "clean": "gts clean",
-    "compile": "tsc -p .; npm run compiletypes",
+    "compile": "scripts/compile.sh",
     "compiletypes": "node scripts/compile-schemas.js",
     "fix": "gts fix",
     "prepare": "npm run compile",
@@ -30,6 +30,7 @@
     "gts": "^1.1.0",
     "jasmine": "^3.4.0",
     "json-schema-to-typescript": "^7.0.0",
+    "ts-node": "^8.3.0",
     "typescript": "~3.5.0"
   },
   "bin": {
@@ -44,6 +45,7 @@
   },
   "dependencies": {
     "ajv": "^6.10.2",
+    "isbinaryfile": "^4.0.2",
     "yargs": "^14.0.0"
   }
 }

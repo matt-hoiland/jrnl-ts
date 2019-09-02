@@ -1,9 +1,7 @@
-#!/usr/bin/env node
-
-const fs = require('fs');
-const jsonts = require('json-schema-to-typescript');
-const path = require('path');
-const process = require('process');
+import * as fs from 'fs';
+import * as jsonts from 'json-schema-to-typescript';
+import * as path from 'path';
+import * as process from 'process';
 
 const SCHEMAS_DIR = path.join('src', 'model');
 const TYPES_DIR = path.join('src', 'model');
@@ -13,7 +11,7 @@ const F_OK = fs.constants.F_OK;
 const R_OK = fs.constants.R_OK;
 const W_OK = fs.constants.W_OK;
 
-function isDirectoryReady(path) {
+function isDirectoryReady(path: string): boolean {
   try {
     fs.accessSync(path, F_OK|R_OK|W_OK)
     return fs.statSync(path).isDirectory();
@@ -49,7 +47,7 @@ for (const schema of schemas) {
 import * as Ajv from 'ajv';
 
 const ajv = new Ajv();
-const schema = ajv.compile(require('../schemas/metadata.json'));
+const schema = ajv.compile(require('./metadata.json'));
 
 export function isValid${basename}(candidate: any): candidate is ${basename} {
   return schema(candidate) === true;
