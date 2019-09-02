@@ -29,15 +29,43 @@ describe('loadEntry', () => {
   });
 
   it('rejects missing file', () => {
-    loadEntry('nonexisten', (error, entry) => {
-      expect(error).not.toBeNull();
-      expect(error!.code).toEqual('ENOENT');
+    expect(() => {
+      loadEntry('nonexistent');
+    }).toThrowMatching(err => {
+      return err.code === 'ENOENT';
     });
   });
 
-  // it('rejects non-text file', () => { fail(); });
-  // it('accepts markdown file extension', () => { fail(); });
-  //
+  it('rejects non-text file', () => {
+    expect(() => {
+      loadEntry('resources/tinyimage.png');
+    }).toThrowMatching(err => {
+      return err.code === 'ERR_INVALID_FD_TYPE';
+    });
+  });
+
+  it('accepts wellformed file with markdown extension', () => {
+    const entry = loadEntry(WELLFORMED_METADATA_NO_TAGS.file_name);
+    expect(entry)
+      .withContext("'entry'")
+      .not.toBeNull();
+    expect(entry!.metadata.date)
+      .withContext("'entry.metadata.date'")
+      .toEqual(WELLFORMED_METADATA_NO_TAGS.date);
+    expect(entry!.metadata.file_name)
+      .withContext("'entry.metadata.file_name'")
+      .toEqual(WELLFORMED_METADATA_NO_TAGS.file_name);
+    expect(entry!.metadata.title)
+      .withContext("'entry.metadata.title'")
+      .toEqual(WELLFORMED_METADATA_NO_TAGS.title);
+    expect(entry!.metadata.tags)
+      .withContext("'entry.metadata.tags'")
+      .toBeUndefined();
+    expect(entry!.text)
+      .withContext("'entry.text'")
+      .toEqual('Body text\n');
+  });
+
   // describe('entry format', () => {
   //   it('rejects non-title text before MetaData', () => { fail(); });
   //   it('accepts entry without a title line', () => { fail(); });
