@@ -44,8 +44,8 @@ for (const schema of schemas) {
       .compileFromFile(path.join(SCHEMAS_DIR, schema))
       .then(ts => fs.writeFileSync(path.join(TYPES_DIR, basename + '.d.ts'), ts));
 
-    const validator = `
-import { ${basename} } from './${basename}';
+    const validator =
+`import { ${basename} } from './${basename}';
 import * as Ajv from 'ajv';
 
 const ajv = new Ajv();
@@ -54,7 +54,8 @@ const schema = ajv.compile(require('../schemas/metadata.json'));
 export function isValid${basename}(candidate: any): candidate is ${basename} {
   return schema(candidate) === true;
 }
-`
+`;
+
     fs.writeFileSync(path.join(VALIDATORS_DIR, basename + '.validator.ts'), validator);
 
   } catch (err) {

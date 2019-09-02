@@ -4,13 +4,12 @@ export const createCommand: yargs.CommandModule = {
   command: 'create <title>',
   describe: 'Create a new journal entry',
   builder: yargs => {
-    return yargs
-      .positional('title', {
-        desc: 'Title of the entry to be made',
-        type: 'string'
-      });
+    return yargs.positional('title', {
+      desc: 'Title of the entry to be made',
+      type: 'string',
+    });
   },
-  handler: argv => console.dir(argv)
+  handler: argv => console.dir(argv),
 };
 
 // export const command = 'create <title>';

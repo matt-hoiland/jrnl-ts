@@ -7,7 +7,6 @@ export class NotImplementedError extends Error {
   }
 }
 
-
 /**
  * loadEntry - asynchronously load Entry from file
  *

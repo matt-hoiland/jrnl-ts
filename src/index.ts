@@ -22,18 +22,18 @@ if (require.main === module) {
     .command('list [--oneline]', 'List all existing entries', yargs => {
       return yargs.option('oneline', {
         desc: 'Use one line per entry',
-        type: 'boolean'
+        type: 'boolean',
       });
     })
     .option('verbose', {
       alias: 'v',
       description: 'Execute with verbose output',
-      type: 'boolean'
+      type: 'boolean',
     })
     .option('quiet', {
       alias: 'q',
       description: 'Execute while supressing output',
-      type: 'boolean'
+      type: 'boolean',
     })
     .conflicts('verbose', 'quiet')
     .help('help', 'Show this help message and exit')
@@ -41,7 +41,7 @@ if (require.main === module) {
     .describe('version', 'Show version number and exit')
     .parse();
 
-    console.dir(argv)
+  console.dir(argv);
 
   // const status = main(argv);
   // exit(status);
