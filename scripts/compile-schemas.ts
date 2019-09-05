@@ -1,3 +1,4 @@
+import * as dedent from 'dedent';
 import * as fs from 'fs';
 import * as jsonts from 'json-schema-to-typescript';
 import * as path from 'path';
@@ -42,17 +43,17 @@ for (const schema of schemas) {
       .compileFromFile(path.join(SCHEMAS_DIR, schema))
       .then(ts => fs.writeFileSync(path.join(TYPES_DIR, basename + '.d.ts'), ts));
 
-    const validator =
-`import { ${basename} } from './${basename}';
-import * as Ajv from 'ajv';
+    const validator = dedent`
+      import { ${basename} } from './${basename}';
+      import * as Ajv from 'ajv';
 
-const ajv = new Ajv();
-const schema = ajv.compile(require('./metadata.json'));
+      const ajv = new Ajv();
+      const schema = ajv.compile(require('./${basename}.json'));
 
-export function isValid${basename}(candidate: any): candidate is ${basename} {
-  return schema(candidate) === true;
-}
-`;
+      export function isValid${basename}(candidate: any): candidate is ${basename} {
+        return schema(candidate) === true;
+      }
+    `;
 
     fs.writeFileSync(path.join(VALIDATORS_DIR, basename + '.validator.ts'), validator);
 
