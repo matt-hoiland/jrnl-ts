@@ -1,34 +1,15 @@
-import { loadEntry } from './utils';
+import {
+  FormatError,
+  InvalidFileTypeError,
+  isValidEntryFormat,
+  loadEntry,
+} from './utils';
 import { MetaData } from './model/MetaData';
 import { Entry } from './model/Entry';
 import * as fs from 'fs';
 
-const WELLFORMED_METADATA_NO_TAGS: MetaData = {
-  date: '1970-01-01T00:00:00Z',
-  file_name: '1970-01-01_Th_Dummy_Title.md',
-  title: 'Dummy Title',
-};
-
-const TESTFILE_GOOD = `
-# Dummy Title
-
-\`\`\`json
-${JSON.stringify(WELLFORMED_METADATA_NO_TAGS, undefined, 2)}
-\`\`\`
-
-Body text
-`;
-
-describe('loadEntry', () => {
-  beforeAll(() => {
-    fs.writeFileSync(WELLFORMED_METADATA_NO_TAGS.file_name, TESTFILE_GOOD);
-  });
-
-  afterAll(() => {
-    fs.unlinkSync(WELLFORMED_METADATA_NO_TAGS.file_name);
-  });
-
-  it('rejects missing file', () => {
+describe('loadFile', () => {
+  it("throws Node Error (code 'ENOENT') missing file", () => {
     expect(() => {
       loadEntry('nonexistent');
     }).toThrowMatching(err => {
@@ -36,61 +17,197 @@ describe('loadEntry', () => {
     });
   });
 
-  it('rejects non-text file', () => {
+  it('throws InvalidFileTypeError for non-text file', () => {
     expect(() => {
       loadEntry('resources/tinyimage.png');
-    }).toThrowMatching(err => {
-      return err.code === 'ERR_INVALID_FD_TYPE';
-    });
+    }).toThrowError(InvalidFileTypeError);
+  });
+});
+
+describe('loadEntry', () => {
+  let metadata: MetaData = { date: '', filename: '', title: '' };
+  afterEach(() => {
+    fs.unlinkSync(metadata.filename);
   });
 
-  it('accepts wellformed file with markdown extension', () => {
-    const entry = loadEntry(WELLFORMED_METADATA_NO_TAGS.file_name);
-    expect(entry)
-      .withContext("'entry'")
-      .not.toBeNull();
-    expect(entry!.metadata.date)
-      .withContext("'entry.metadata.date'")
-      .toEqual(WELLFORMED_METADATA_NO_TAGS.date);
-    expect(entry!.metadata.file_name)
-      .withContext("'entry.metadata.file_name'")
-      .toEqual(WELLFORMED_METADATA_NO_TAGS.file_name);
-    expect(entry!.metadata.title)
-      .withContext("'entry.metadata.title'")
-      .toEqual(WELLFORMED_METADATA_NO_TAGS.title);
-    expect(entry!.metadata.tags)
-      .withContext("'entry.metadata.tags'")
-      .toBeUndefined();
-    expect(entry!.text)
-      .withContext("'entry.text'")
-      .toEqual('Body text\n');
+  it('accepts file with correct format', () => {
+    metadata = {
+      date: '1970-01-01T00:00:00Z',
+      filename: '1970-01-01_Th_Dummy_Title.md',
+      title: 'Dummy Title',
+    };
+
+    fs.writeFileSync(
+      metadata.filename,
+      `# Dummy Title
+
+\`\`\`json
+${JSON.stringify(metadata, undefined, 2)}
+\`\`\`
+
+Body text
+`
+    );
+
+    const entry = loadEntry(metadata.filename);
+    expect(entry).not.toBeNull();
+    expect(entry.metadata).toEqual(metadata);
+    expect(entry.metadata.tags).toBeUndefined();
+    expect(entry.text).toEqual('Body text\n');
   });
 
-  // describe('entry format', () => {
-  //   it('rejects non-title text before MetaData', () => { fail(); });
-  //   it('accepts entry without a title line', () => { fail(); });
-  //   it('accepts entry with empty body', () => { fail(); });
-  // });
-  //
-  // describe('parsing MetaData', () => {
-  //   describe('json', () => {
-  //     it('rejects missing json', () => { fail(); });
-  //     it('rejects malformed json', () => { fail(); });
-  //     it('accepts wellformed json', () => { fail(); });
-  //     it('accepts when entry has multiple json blocks', () => { fail(); });
-  //   });
-  //
-  //   describe('properties', () => {
-  //     it('rejects extra properties', () => { fail(); });
-  //     it('rejects missing properties', () => { fail(); });
-  //     it('rejects duplicate tags', () => { fail(); });
-  //     it('accepts without 'tags' propertie', () => { fail(); });
-  //   });
-  //
-  //   describe('timestamp', () => {
-  //     it('rejects bad ISO time', () => { fail(); });
-  //     it('accepts UTC', () => { fail(); });
-  //     it('accepts timezone offsets', () => { fail(); });
-  //   });
-  // });
+  it('throws FormatError file with wrong format', () => {
+    metadata = {
+      date: '1970-01-01T00:00:00Z',
+      filename: '1970-01-01_Th_Dummy_Title.md',
+      title: 'Dummy Title',
+    };
+
+    fs.writeFileSync(
+      metadata.filename,
+      `# Dummy Title
+Breaking text
+\`\`\`json
+${JSON.stringify(metadata, undefined, 2)}
+\`\`\`
+
+Body text
+`
+    );
+
+    expect(() => loadEntry(metadata.filename)).toThrowError(FormatError);
+  });
+});
+
+describe('isValidEntryFormat', () => {
+  const metadata: MetaData = { date: '', filename: '', title: '' };
+
+  it('accepts entry without a title line', () => {
+    const text = `\`\`\`json
+${JSON.stringify(metadata, undefined, 2)}
+\`\`\`
+
+Body text
+`;
+
+    expect(isValidEntryFormat(Buffer.from(text))).toBeTruthy();
+  });
+
+  it('accepts entry with empty body', () => {
+    const text = `\`\`\`json
+${JSON.stringify(metadata, undefined, 2)}
+\`\`\``;
+
+    expect(isValidEntryFormat(Buffer.from(text))).toBeTruthy();
+  });
+
+  it('rejects non-title text before MetaData', () => {
+    const text = `# Title
+breaking text
+\`\`\`json
+${JSON.stringify(metadata, undefined, 2)}
+\`\`\`
+
+body`;
+
+    expect(isValidEntryFormat(Buffer.from(text))).toBeFalsy();
+  });
+
+  it('rejects broken metadata code frames', () => {
+    expect(
+      isValidEntryFormat(
+        Buffer.from(
+          `# Title
+${JSON.stringify(metadata, undefined, 2)}
+\`\`\`
+`
+        )
+      )
+    ).toBeFalsy();
+
+    expect(
+      isValidEntryFormat(
+        Buffer.from(
+          `# Title
+\`\`\`json
+${JSON.stringify(metadata, undefined, 2)}
+`
+        )
+      )
+    ).toBeFalsy();
+
+    expect(
+      isValidEntryFormat(
+        Buffer.from(
+          `# Title
+\`\`\`markdown
+${JSON.stringify(metadata, undefined, 2)}
+\`\`\`
+`
+        )
+      )
+    ).toBeFalsy();
+  });
+
+  it('rejects multiple title lines', () => {
+    const text = `# Title
+# Also a title
+\`\`\`json
+${JSON.stringify(metadata, undefined, 2)}
+\`\`\`
+`;
+
+    expect(isValidEntryFormat(Buffer.from(text))).toBeFalsy();
+  });
+
+  it('rejects title line that is not h1', () => {
+    const text = `## Title
+
+\`\`\`json
+${JSON.stringify(metadata, undefined, 2)}
+\`\`\`
+`;
+
+    expect(isValidEntryFormat(Buffer.from(text))).toBeFalsy();
+  });
+});
+
+describe('extractMetaData', () => {
+  it('accepts wellformed json', () => {
+    fail('Test not yet written');
+  });
+
+  it('accepts when entry has multiple json blocks', () => {
+    fail('Test not yet written');
+  });
+
+  it('throws FormatError missing json', () => {
+    fail('Test not yet written');
+  });
+
+  it('throws FormatError malformed json', () => {
+    fail('Test not yet written');
+  });
+});
+
+describe('extractBodyText', () => {
+  it('trims leading whitespace', () => {
+    fail('Test not yet implemented');
+  });
+
+  it('trims trailing whitespace', () => {
+    fail('Test not yet implemented');
+  });
+
+  it('produces empty string for an empty body', () => {
+    fail('Test not yet implemented');
+  });
+
+  it('only looks for first instance of /^```$/ to find start of body text', () => {
+    fail('Test not yet implemented');
+  });
+
+  it('throws FormatError for text without a /^```$/ line', () => {
+    fail('Test not yet implemented');
+  });
 });
