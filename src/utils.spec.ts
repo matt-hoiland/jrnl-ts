@@ -1,12 +1,15 @@
 import {
   FormatError,
   InvalidFileTypeError,
+  extractBodyText,
+  extractMetaData,
   isValidEntryFormat,
   loadEntry,
 } from './utils';
 import { MetaData } from './model/MetaData';
 import { Entry } from './model/Entry';
 import * as fs from 'fs';
+import * as dedent from 'dedent';
 
 describe('loadFile', () => {
   it("throws Node Error (code 'ENOENT') missing file", () => {
@@ -39,21 +42,22 @@ describe('loadEntry', () => {
 
     fs.writeFileSync(
       metadata.filename,
-      `# Dummy Title
+      dedent`
+        # Dummy Title
 
-\`\`\`json
-${JSON.stringify(metadata, undefined, 2)}
-\`\`\`
+        \`\`\`json
+        ${JSON.stringify(metadata)}
+        \`\`\`
 
-Body text
-`
+        Body text
+      `
     );
 
     const entry = loadEntry(metadata.filename);
     expect(entry).not.toBeNull();
     expect(entry.metadata).toEqual(metadata);
     expect(entry.metadata.tags).toBeUndefined();
-    expect(entry.text).toEqual('Body text\n');
+    expect(entry.text).toEqual('Body text');
   });
 
   it('throws FormatError file with wrong format', () => {
@@ -65,14 +69,15 @@ Body text
 
     fs.writeFileSync(
       metadata.filename,
-      `# Dummy Title
-Breaking text
-\`\`\`json
-${JSON.stringify(metadata, undefined, 2)}
-\`\`\`
+      dedent`
+        # Dummy Title
+        Breaking text
+        \`\`\`json
+        ${JSON.stringify(metadata)}
+        \`\`\`
 
-Body text
-`
+        Body text
+      `
     );
 
     expect(() => loadEntry(metadata.filename)).toThrowError(FormatError);
@@ -83,32 +88,37 @@ describe('isValidEntryFormat', () => {
   const metadata: MetaData = { date: '', filename: '', title: '' };
 
   it('accepts entry without a title line', () => {
-    const text = `\`\`\`json
-${JSON.stringify(metadata, undefined, 2)}
-\`\`\`
+    const text = dedent`
+      \`\`\`json
+      ${JSON.stringify(metadata)}
+      \`\`\`
 
-Body text
-`;
+      Body text
+    `;
 
     expect(isValidEntryFormat(Buffer.from(text))).toBeTruthy();
   });
 
   it('accepts entry with empty body', () => {
-    const text = `\`\`\`json
-${JSON.stringify(metadata, undefined, 2)}
-\`\`\``;
+    const text = dedent`
+      \`\`\`json
+      ${JSON.stringify(metadata)}
+      \`\`\`
+    `;
 
     expect(isValidEntryFormat(Buffer.from(text))).toBeTruthy();
   });
 
   it('rejects non-title text before MetaData', () => {
-    const text = `# Title
-breaking text
-\`\`\`json
-${JSON.stringify(metadata, undefined, 2)}
-\`\`\`
+    const text = dedent`
+      # Title
+      breaking text
+      \`\`\`json
+      ${JSON.stringify(metadata)}
+      \`\`\`
 
-body`;
+      body
+    `;
 
     expect(isValidEntryFormat(Buffer.from(text))).toBeFalsy();
   });
@@ -117,10 +127,11 @@ body`;
     expect(
       isValidEntryFormat(
         Buffer.from(
-          `# Title
-${JSON.stringify(metadata, undefined, 2)}
-\`\`\`
-`
+          dedent`
+            # Title
+            ${JSON.stringify(metadata)}
+            \`\`\`
+          `
         )
       )
     ).toBeFalsy();
@@ -128,10 +139,11 @@ ${JSON.stringify(metadata, undefined, 2)}
     expect(
       isValidEntryFormat(
         Buffer.from(
-          `# Title
-\`\`\`json
-${JSON.stringify(metadata, undefined, 2)}
-`
+          dedent`
+            # Title
+            \`\`\`json
+            ${JSON.stringify(metadata)}
+          `
         )
       )
     ).toBeFalsy();
@@ -139,34 +151,37 @@ ${JSON.stringify(metadata, undefined, 2)}
     expect(
       isValidEntryFormat(
         Buffer.from(
-          `# Title
-\`\`\`markdown
-${JSON.stringify(metadata, undefined, 2)}
-\`\`\`
-`
+          dedent`
+            # Title
+            \`\`\`markdown
+            ${JSON.stringify(metadata)}
+            \`\`\`
+          `
         )
       )
     ).toBeFalsy();
   });
 
   it('rejects multiple title lines', () => {
-    const text = `# Title
-# Also a title
-\`\`\`json
-${JSON.stringify(metadata, undefined, 2)}
-\`\`\`
-`;
+    const text = dedent`
+      # Title
+      # Also a title
+      \`\`\`json
+      ${JSON.stringify(metadata)}
+      \`\`\`
+    `;
 
     expect(isValidEntryFormat(Buffer.from(text))).toBeFalsy();
   });
 
   it('rejects title line that is not h1', () => {
-    const text = `## Title
+    const text = dedent`
+      ## Title
 
-\`\`\`json
-${JSON.stringify(metadata, undefined, 2)}
-\`\`\`
-`;
+      \`\`\`json
+      ${JSON.stringify(metadata)}
+      \`\`\`
+    `;
 
     expect(isValidEntryFormat(Buffer.from(text))).toBeFalsy();
   });
@@ -174,40 +189,127 @@ ${JSON.stringify(metadata, undefined, 2)}
 
 describe('extractMetaData', () => {
   it('accepts wellformed json', () => {
-    fail('Test not yet written');
+    const text = dedent`
+      \`\`\`json
+      {
+        "title": "A good title",
+        "date": "1970-01-01T00:00:00Z",
+        "filename": "1970-01-01_Th_A_good_title.md"
+      }
+      \`\`\`
+    `;
+
+    expect(extractMetaData(Buffer.from(text))).toEqual({
+      title: 'A good title',
+      date: '1970-01-01T00:00:00Z',
+      filename: '1970-01-01_Th_A_good_title.md',
+    });
   });
 
   it('accepts when entry has multiple json blocks', () => {
-    fail('Test not yet written');
+    const text = dedent`
+      \`\`\`json
+      {
+        "title": "A good title",
+        "date": "1970-01-01T00:00:00Z",
+        "filename": "1970-01-01_Th_A_good_title.md"
+      }
+      \`\`\`
+
+      \`\`\`json
+      {
+        "data": "other data"
+      }
+      \`\`\`
+    `;
+
+    expect(extractMetaData(Buffer.from(text))).toEqual({
+      title: 'A good title',
+      date: '1970-01-01T00:00:00Z',
+      filename: '1970-01-01_Th_A_good_title.md',
+    });
   });
 
-  it('throws FormatError missing json', () => {
-    fail('Test not yet written');
+  it('throws FormatError for missing json', () => {
+    expect(() => extractMetaData(Buffer.from('No json!'))).toThrowError(
+      FormatError
+    );
   });
 
-  it('throws FormatError malformed json', () => {
-    fail('Test not yet written');
+  it('throws FormatError for invalid MetaData', () => {
+    const text = dedent`
+      \`\`\`json
+      {
+        "Title": "A good title",
+        "date": "01/01/1970 12:00 AM",
+        "file_name": "1970-01-01_Th_A_good_title.md"
+      }
+      \`\`\`
+    `;
+
+    expect(() => extractMetaData(Buffer.from(text))).toThrowError(FormatError);
+  });
+
+  it('throws SyntaxError for malformed json', () => {
+    const text = dedent`
+      \`\`\`json
+      {
+        'title': "A good title",
+        date: "1970-01-01T00:00:00Z",
+        "filename": "1970-01-01_Th_A_good_title.md",
+      }
+      \`\`\`
+    `;
+
+    expect(() => extractMetaData(Buffer.from(text))).toThrowError(SyntaxError);
   });
 });
 
 describe('extractBodyText', () => {
   it('trims leading whitespace', () => {
-    fail('Test not yet implemented');
+    const text = dedent`
+      \`\`\`
+
+
+
+
+
+      body`;
+
+    expect(extractBodyText(Buffer.from(text))).toEqual('body');
   });
 
   it('trims trailing whitespace', () => {
-    fail('Test not yet implemented');
+    const text = '```\nbody\n\n\n\n\n';
+
+    expect(extractBodyText(Buffer.from(text))).toEqual('body');
   });
 
   it('produces empty string for an empty body', () => {
-    fail('Test not yet implemented');
+    expect(extractBodyText(Buffer.from('```'))).toEqual('');
   });
 
   it('only looks for first instance of /^```$/ to find start of body text', () => {
-    fail('Test not yet implemented');
+    const text = dedent`
+      \`\`\`
+      This is a paragraph that does not have a starting code fence.
+
+      \`\`\`json
+        "more data"
+      \`\`\`
+    `;
+
+    expect(extractBodyText(Buffer.from(text))).toEqual(
+      text
+        .split('\n')
+        .slice(1)
+        .join('\n')
+    );
   });
 
   it('throws FormatError for text without a /^```$/ line', () => {
-    fail('Test not yet implemented');
+    const text = 'There is not starting code fence';
+
+    expect(() => extractBodyText(Buffer.from(text))).toThrowError(FormatError);
   });
 });
