@@ -1,11 +1,11 @@
 {
   "title": "MetaData",
   "type": "object",
-  "required": ["date", "file_name", "title"],
+  "required": ["date", "filename", "title"],
   "additionalProperties": false,
   "properties": {
     "date": { "$ref": "#/definitions/ISOTime" },
-    "file_name": {
+    "filename": {
       "type": "string"
     },
     "tags": {
