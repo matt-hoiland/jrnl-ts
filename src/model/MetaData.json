@@ -1,0 +1,25 @@
+{
+  "title": "MetaData",
+  "type": "object",
+  "required": ["date", "filename", "title"],
+  "additionalProperties": false,
+  "properties": {
+    "date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "filename": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "title": {
+      "type": "string"
+    }
+  }
+}

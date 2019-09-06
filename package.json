@@ -16,18 +16,22 @@
     "test": "jasmine",
     "check": "gts check",
     "clean": "gts clean",
-    "compile": "tsc -p .",
+    "compile": "scripts/compile.sh",
+    "compiletypes": "node scripts/compile-schemas.js",
     "fix": "gts fix",
     "prepare": "npm run compile",
     "pretest": "npm run compile",
     "posttest": "npm run check"
   },
   "devDependencies": {
+    "@types/dedent": "^0.7.0",
     "@types/jasmine": "^3.4.0",
     "@types/node": "^10.0.3",
     "@types/yargs": "^13.0.2",
     "gts": "^1.1.0",
     "jasmine": "^3.4.0",
+    "json-schema-to-typescript": "^7.0.0",
+    "ts-node": "^8.3.0",
     "typescript": "~3.5.0"
   },
   "bin": {
@@ -41,6 +45,9 @@
     "url": "ssh://git@github.com:matt-hoiland/jrnl.git"
   },
   "dependencies": {
+    "ajv": "^6.10.2",
+    "dedent": "^0.7.0",
+    "isbinaryfile": "^4.0.2",
     "yargs": "^14.0.0"
   }
 }

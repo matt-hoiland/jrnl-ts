@@ -15,7 +15,10 @@ At the moment, it only prints a `'Hello, World!'` message.
 
 ## Help Page (is not printed yet)
 
-
 ```text
 usage: jrnl
 ```
+
+## Documentation
+
+- [Entry Format](docs/Entries.md)
