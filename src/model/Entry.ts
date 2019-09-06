@@ -1,4 +1,3 @@
-import { isValidMetaData } from './MetaData.validator';
 import { MetaData } from './MetaData';
 
 export class Entry {
