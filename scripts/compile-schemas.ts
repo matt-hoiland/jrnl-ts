@@ -55,7 +55,7 @@ for (const schema of schemas) {
       }
     `;
 
-    fs.writeFileSync(path.join(VALIDATORS_DIR, basename + '.validator.ts'), validator);
+    fs.writeFileSync(path.join(VALIDATORS_DIR, basename + '.validator.ts'), validator + '\n');
 
   } catch (err) {
     console.error(err);
