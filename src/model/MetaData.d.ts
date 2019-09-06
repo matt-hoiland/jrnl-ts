@@ -5,10 +5,8 @@
  * and run json-schema-to-typescript to regenerate this file.
  */
 
-export type ISOTime = string;
-
 export interface MetaData {
-  date: ISOTime;
+  date: string;
   filename: string;
   tags?: string[];
   title: string;
