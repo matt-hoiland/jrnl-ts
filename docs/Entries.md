@@ -31,10 +31,10 @@ where `{MetaData.date.slice(0,10)}` corresponds to only the `YYYY-MM-DD` portion
 All correct journal entry file names should conform to this pattern:
 
 ```js
-/\d{4}-\d{2}-\d{2}_(Su|Mo|Tu|We|Th|Fr|Sa)(_\w+)?\.md/
+/\d{4}-\d{2}-\d{2}_(Su|Mo|Tu|We|Th|Fr|Sa)(_[a-z0-9][a-z0-9_]+[a-z0-9])?\.md/
 ```
 
-where the title portion is optional.
+where the title portion is optional. Titles in the filename can only have lower case characters and digits with underscores between the words.
 
 
 ### The simplifier function
