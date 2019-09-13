@@ -201,7 +201,7 @@ describe('filename', () => {
   it('accepts names without the title part', () => {
     expect(
       isValidMetaData({
-        date: '1970-01-1T00:00:00Z',
+        date: '1970-01-01T00:00:00Z',
         filename: '1970-01-01_Th.md',
         title: '',
       })
@@ -211,7 +211,7 @@ describe('filename', () => {
   it('accepts names with the title part', () => {
     expect(
       isValidMetaData({
-        date: '1970-01-1T00:00:00Z',
+        date: '1970-01-01T00:00:00Z',
         filename: '1970-01-01_Th_this_is_a_nightmare.md',
         title: 'This is a nightmare',
       })
@@ -221,31 +221,64 @@ describe('filename', () => {
   it('rejects missing weekday', () => {
     expect(
       isValidMetaData({
-        date: '1970-01-1T00:00:00Z',
+        date: '1970-01-01T00:00:00Z',
         filename: '1970-01-01_this_is_a_nightmare.md',
         title: 'This is a nightmare',
       })
-    ).toBeTruthy();
+    ).toBeFalsy();
   });
 
   it('rejects bad date format', () => {
     expect(
       isValidMetaData({
-        date: '1970-01-1T00:00:00Z',
+        date: '1970-01-01T00:00:00Z',
         filename: '70-01-01_Th_this_is_a_nightmare.md',
         title: 'This is a nightmare',
       })
-    ).toBeTruthy();
+    ).toBeFalsy();
     expect(
       isValidMetaData({
-        date: '1970-01-1T00:00:00Z',
+        date: '1970-01-01T00:00:00Z',
         filename: '70-01-01_Th.md',
         title: 'This is a nightmare',
       })
-    ).toBeTruthy();
+    ).toBeFalsy();
   });
 
   it('rejects titles with non word characters', () => {
-    fail();
+    expect(
+      isValidMetaData({
+        date: '1970-01-01T00:00:00Z',
+        filename: "70-01-01_Th_abc 098 ! let's.md",
+        title: 'This is a nightmare',
+      })
+    ).toBeFalsy();
+  });
+
+  it('rejects titles with capital characters', () => {
+    expect(
+      isValidMetaData({
+        date: '1970-01-01T00:00:00Z',
+        filename: '70-01-01_Th_This_is_a_nightmare.md',
+        title: 'This is a nightmare',
+      })
+    ).toBeFalsy();
+  });
+
+  it('rejects titles with trailing and leading underscores', () => {
+    expect(
+      isValidMetaData({
+        date: '1970-01-01T00:00:00Z',
+        filename: '70-01-01_Th__what.md',
+        title: 'This is a nightmare',
+      })
+    ).toBeFalsy();
+    expect(
+      isValidMetaData({
+        date: '1970-01-01T00:00:00Z',
+        filename: '70-01-01_Th_what_.md',
+        title: 'This is a nightmare',
+      })
+    ).toBeFalsy();
   });
 });
