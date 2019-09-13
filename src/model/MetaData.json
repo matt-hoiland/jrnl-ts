@@ -9,7 +9,8 @@
       "format": "date-time"
     },
     "filename": {
-      "type": "string"
+      "type": "string",
+      "pattern": "\\d{4}-\\d{2}-\\d{2}_(Su|Mo|Tu|We|Th|Fr|Sa)(_[a-z0-9][a-z0-9_]+[a-z0-9])?\\.md"
     },
     "tags": {
       "type": "array",
