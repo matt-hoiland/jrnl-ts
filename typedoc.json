@@ -1,0 +1,7 @@
+{
+  "out": "tdocs",
+  "mode": "modules",
+  "exclude":"**/*+(index|.spec|.e2e).ts",
+  "includeDeclarations": true,
+  "excludeExternals": true
+}
