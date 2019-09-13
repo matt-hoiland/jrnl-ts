@@ -36,7 +36,7 @@ describe('loadEntry', () => {
   it('accepts file with correct format', () => {
     metadata = {
       date: '1970-01-01T00:00:00Z',
-      filename: '1970-01-01_Th_Dummy_Title.md',
+      filename: '1970-01-01_Th_dummy_title.md',
       title: 'Dummy Title',
     };
 
@@ -63,7 +63,7 @@ describe('loadEntry', () => {
   it('throws FormatError file with wrong format', () => {
     metadata = {
       date: '1970-01-01T00:00:00Z',
-      filename: '1970-01-01_Th_Dummy_Title.md',
+      filename: '1970-01-01_Th_dummy_title.md',
       title: 'Dummy Title',
     };
 
@@ -194,7 +194,7 @@ describe('extractMetaData', () => {
       {
         "title": "A good title",
         "date": "1970-01-01T00:00:00Z",
-        "filename": "1970-01-01_Th_A_good_title.md"
+        "filename": "1970-01-01_Th_a_good_title.md"
       }
       \`\`\`
     `;
@@ -202,7 +202,7 @@ describe('extractMetaData', () => {
     expect(extractMetaData(Buffer.from(text))).toEqual({
       title: 'A good title',
       date: '1970-01-01T00:00:00Z',
-      filename: '1970-01-01_Th_A_good_title.md',
+      filename: '1970-01-01_Th_a_good_title.md',
     });
   });
 
@@ -212,7 +212,7 @@ describe('extractMetaData', () => {
       {
         "title": "A good title",
         "date": "1970-01-01T00:00:00Z",
-        "filename": "1970-01-01_Th_A_good_title.md"
+        "filename": "1970-01-01_Th_a_good_title.md"
       }
       \`\`\`
 
@@ -226,7 +226,7 @@ describe('extractMetaData', () => {
     expect(extractMetaData(Buffer.from(text))).toEqual({
       title: 'A good title',
       date: '1970-01-01T00:00:00Z',
-      filename: '1970-01-01_Th_A_good_title.md',
+      filename: '1970-01-01_Th_a_good_title.md',
     });
   });
 
@@ -242,7 +242,7 @@ describe('extractMetaData', () => {
       {
         "Title": "A good title",
         "date": "01/01/1970 12:00 AM",
-        "file_name": "1970-01-01_Th_A_good_title.md"
+        "file_name": "1970-01-01_Th_a_good_title.md"
       }
       \`\`\`
     `;
@@ -256,7 +256,7 @@ describe('extractMetaData', () => {
       {
         'title': "A good title",
         date: "1970-01-01T00:00:00Z",
-        "filename": "1970-01-01_Th_A_good_title.md",
+        "filename": "1970-01-01_Th_a_good_title.md",
       }
       \`\`\`
     `;

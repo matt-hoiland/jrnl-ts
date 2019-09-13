@@ -5,7 +5,7 @@ describe('properties', () => {
     expect(
       isValidMetaData({
         date: '1970-01-01T00:00:00Z',
-        filename: '',
+        filename: '1970-01-01_Th.md',
         title: '',
       })
     ).toBeTruthy();
@@ -15,7 +15,7 @@ describe('properties', () => {
     expect(
       isValidMetaData({
         date: '1970-01-01T00:00:00Z',
-        filename: '',
+        filename: '1970-01-01_Th.md',
         title: '',
         tags: [],
       })
@@ -26,7 +26,7 @@ describe('properties', () => {
     expect(
       isValidMetaData({
         date: '1970-01-01T00:00:00Z',
-        filename: '',
+        filename: '1970-01-01_Th.md',
         title: '',
         star: true,
       })
@@ -42,14 +42,14 @@ describe('properties', () => {
     ).toBeFalsy();
     expect(
       isValidMetaData({
-        filename: '',
+        filename: '1970-01-01_Th.md',
         title: '',
       })
     ).toBeFalsy();
     expect(
       isValidMetaData({
         date: '1970-01-01T00:00:00Z',
-        filename: '',
+        filename: '1970-01-01_Th.md',
       })
     ).toBeFalsy();
   });
@@ -58,7 +58,7 @@ describe('properties', () => {
     expect(
       isValidMetaData({
         date: '1970-01-01T00:00:00Z',
-        filename: '',
+        filename: '1970-01-01_Th.md',
         title: '',
         tags: ['a', 'b', 'a'],
       })
@@ -69,7 +69,7 @@ describe('properties', () => {
     expect(
       isValidMetaData({
         date: 0,
-        filename: '',
+        filename: '1970-01-01_Th.md',
         title: '',
       })
     ).toBeFalsy();
@@ -83,7 +83,7 @@ describe('properties', () => {
     expect(
       isValidMetaData({
         date: '1970-01-01T00:00:00Z',
-        filename: '',
+        filename: '1970-01-01_Th.md',
         title: {},
       })
     ).toBeFalsy();
@@ -93,7 +93,7 @@ describe('properties', () => {
     expect(
       isValidMetaData({
         date: '1970-01-01T00:00:00Z',
-        filename: '',
+        filename: '1970-01-01_Th.md',
         title: '',
         tags: 'star',
       })
@@ -106,7 +106,7 @@ describe('ISOTime', () => {
     expect(
       isValidMetaData({
         date: '1970-01-01T00:00:00Z',
-        filename: '',
+        filename: '1970-01-01_Th.md',
         title: '',
       })
     ).toBeTruthy();
@@ -116,14 +116,14 @@ describe('ISOTime', () => {
     expect(
       isValidMetaData({
         date: '1970-01-01T00:00:00-06:00',
-        filename: '',
+        filename: '1970-01-01_Th.md',
         title: '',
       })
     ).toBeTruthy();
     expect(
       isValidMetaData({
         date: '1970-01-01T00:00:00.0000-06:00',
-        filename: '',
+        filename: '1970-01-01_Th.md',
         title: '',
       })
     ).toBeTruthy();
@@ -133,7 +133,7 @@ describe('ISOTime', () => {
     expect(
       isValidMetaData({
         date: '1970-01-01T00:00:00Z',
-        filename: '',
+        filename: '1970-01-01_Th.md',
         title: '',
       })
     ).toBeTruthy();
@@ -143,7 +143,7 @@ describe('ISOTime', () => {
     expect(
       isValidMetaData({
         date: '1970-01-01T00:00:00.0000Z',
-        filename: '',
+        filename: '1970-01-01_Th.md',
         title: '',
       })
     ).toBeTruthy();
@@ -153,7 +153,7 @@ describe('ISOTime', () => {
     expect(
       isValidMetaData({
         date: '1970-01-01T00:00Z',
-        filename: '',
+        filename: '1970-01-01_Th.md',
         title: '',
       })
     ).toBeFalsy();
@@ -163,7 +163,7 @@ describe('ISOTime', () => {
     expect(
       isValidMetaData({
         date: '1970-01-01T00:00.0000Z',
-        filename: '',
+        filename: '1970-01-01_Th.md',
         title: '',
       })
     ).toBeFalsy();
@@ -173,7 +173,7 @@ describe('ISOTime', () => {
     expect(
       isValidMetaData({
         date: '1970-01-01T00:00:00',
-        filename: '',
+        filename: '1970-01-01_Th.md',
         title: '',
       })
     ).toBeFalsy();
@@ -183,15 +183,101 @@ describe('ISOTime', () => {
     expect(
       isValidMetaData({
         date: '70-01-01T00:00Z',
-        filename: '',
+        filename: '1970-01-01_Th.md',
         title: '',
       })
     ).toBeFalsy();
     expect(
       isValidMetaData({
         date: '1970-01-01 00:00Z',
-        filename: '',
+        filename: '1970-01-01_Th.md',
         title: '',
+      })
+    ).toBeFalsy();
+  });
+});
+
+describe('filename', () => {
+  it('accepts names without the title part', () => {
+    expect(
+      isValidMetaData({
+        date: '1970-01-01T00:00:00Z',
+        filename: '1970-01-01_Th.md',
+        title: '',
+      })
+    ).toBeTruthy();
+  });
+
+  it('accepts names with the title part', () => {
+    expect(
+      isValidMetaData({
+        date: '1970-01-01T00:00:00Z',
+        filename: '1970-01-01_Th_this_is_a_nightmare.md',
+        title: 'This is a nightmare',
+      })
+    ).toBeTruthy();
+  });
+
+  it('rejects missing weekday', () => {
+    expect(
+      isValidMetaData({
+        date: '1970-01-01T00:00:00Z',
+        filename: '1970-01-01_this_is_a_nightmare.md',
+        title: 'This is a nightmare',
+      })
+    ).toBeFalsy();
+  });
+
+  it('rejects bad date format', () => {
+    expect(
+      isValidMetaData({
+        date: '1970-01-01T00:00:00Z',
+        filename: '70-01-01_Th_this_is_a_nightmare.md',
+        title: 'This is a nightmare',
+      })
+    ).toBeFalsy();
+    expect(
+      isValidMetaData({
+        date: '1970-01-01T00:00:00Z',
+        filename: '70-01-01_Th.md',
+        title: 'This is a nightmare',
+      })
+    ).toBeFalsy();
+  });
+
+  it('rejects titles with non word characters', () => {
+    expect(
+      isValidMetaData({
+        date: '1970-01-01T00:00:00Z',
+        filename: "70-01-01_Th_abc 098 ! let's.md",
+        title: 'This is a nightmare',
+      })
+    ).toBeFalsy();
+  });
+
+  it('rejects titles with capital characters', () => {
+    expect(
+      isValidMetaData({
+        date: '1970-01-01T00:00:00Z',
+        filename: '70-01-01_Th_This_is_a_nightmare.md',
+        title: 'This is a nightmare',
+      })
+    ).toBeFalsy();
+  });
+
+  it('rejects titles with trailing and leading underscores', () => {
+    expect(
+      isValidMetaData({
+        date: '1970-01-01T00:00:00Z',
+        filename: '70-01-01_Th__what.md',
+        title: 'This is a nightmare',
+      })
+    ).toBeFalsy();
+    expect(
+      isValidMetaData({
+        date: '1970-01-01T00:00:00Z',
+        filename: '70-01-01_Th_what_.md',
+        title: 'This is a nightmare',
       })
     ).toBeFalsy();
   });
