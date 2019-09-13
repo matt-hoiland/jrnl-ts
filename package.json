@@ -32,6 +32,7 @@
     "jasmine": "^3.4.0",
     "json-schema-to-typescript": "^7.0.0",
     "ts-node": "^8.3.0",
+    "typedoc": "^0.15.0",
     "typescript": "~3.5.0"
   },
   "bin": {
