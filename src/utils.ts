@@ -1,19 +1,12 @@
 import * as fs from 'fs';
+import { isBinaryFileSync } from 'isbinaryfile';
+
+import { FormatError, InvalidFileTypeError } from './errors';
 import { Entry } from './model/Entry';
 import { MetaData } from './model/MetaData';
-import { isBinaryFileSync } from 'isbinaryfile';
 import { isValidMetaData } from './model/MetaData.validator';
 
 export const trimr = (str: string): string => str.replace(/\s+$/, '');
-
-export class NotImplementedError extends Error {
-  constructor(name: string) {
-    super(`${name} has not yet been implemented`);
-  }
-}
-
-export class FormatError extends Error {}
-export class InvalidFileTypeError extends Error {}
 
 export function loadEntry(filename: string): Entry {
   const data = loadFile(filename);

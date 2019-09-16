@@ -1,15 +1,15 @@
+import * as fs from 'fs';
+import * as dedent from 'dedent';
+
 import {
-  FormatError,
-  InvalidFileTypeError,
   extractBodyText,
   extractMetaData,
   isValidEntryFormat,
   loadEntry,
 } from './utils';
+import { FormatError, InvalidFileTypeError } from './errors';
 import { MetaData } from './model/MetaData';
 import { Entry } from './model/Entry';
-import * as fs from 'fs';
-import * as dedent from 'dedent';
 
 describe('loadFile', () => {
   it("throws Node Error (code 'ENOENT') missing file", () => {
