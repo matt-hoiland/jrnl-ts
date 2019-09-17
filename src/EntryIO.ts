@@ -1,7 +1,11 @@
 import * as fs from 'fs';
 import { isBinaryFileSync } from 'isbinaryfile';
 
-import { FormatError, InvalidFileTypeError } from './errors';
+import {
+  FormatError,
+  InvalidFileTypeError,
+  NotImplementedError,
+} from './errors';
 import { Entry } from './model/Entry';
 import { MetaData } from './model/MetaData';
 import { isValidMetaData } from './model/MetaData.validator';
@@ -16,6 +20,21 @@ export class EntryIO {
     const metadata = EntryIO.extractMetaData(data);
     const bodytext = EntryIO.extractBodyText(data);
     return new Entry(metadata, bodytext);
+  }
+
+  /**
+   * Save `entry` to file using its filename found in its [[MetaData]].
+   * Optionally specify a target directory.
+   *
+   * @param entry The entry to be saved
+   * @param path the path-like string pointing to the directory to be saved.
+   * @throws [[InvalidFileTypeError]] if `path` does not point to a directory
+   *   (including if the path doesn't exist)
+   * @throws [[FormatError]] if `entry.metadata` does not conform to schema
+   *   [[isValidMetaData]]
+   */
+  static save(entry: Entry, path = '.'): void {
+    throw new NotImplementedError('EntryIO.save');
   }
 
   static isValidFormat(filename: string): boolean;
