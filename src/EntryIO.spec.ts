@@ -1,20 +1,15 @@
-import {
-  FormatError,
-  InvalidFileTypeError,
-  extractBodyText,
-  extractMetaData,
-  isValidEntryFormat,
-  loadEntry,
-} from './utils';
-import { MetaData } from './model/MetaData';
-import { Entry } from './model/Entry';
 import * as fs from 'fs';
 import * as dedent from 'dedent';
 
-describe('loadFile', () => {
+import { EntryIO } from './EntryIO';
+import { FormatError, InvalidFileTypeError } from './errors';
+import { MetaData } from './model/MetaData';
+import { Entry } from './model/Entry';
+
+describe('EntryIO.load errors', () => {
   it("throws Node Error (code 'ENOENT') missing file", () => {
     expect(() => {
-      loadEntry('nonexistent');
+      EntryIO.load('nonexistent');
     }).toThrowMatching(err => {
       return err.code === 'ENOENT';
     });
@@ -22,12 +17,12 @@ describe('loadFile', () => {
 
   it('throws InvalidFileTypeError for non-text file', () => {
     expect(() => {
-      loadEntry('resources/tinyimage.png');
+      EntryIO.load('resources/tinyimage.png');
     }).toThrowError(InvalidFileTypeError);
   });
 });
 
-describe('loadEntry', () => {
+describe('EntryIO.load', () => {
   let metadata: MetaData = { date: '', filename: '', title: '' };
   afterEach(() => {
     fs.unlinkSync(metadata.filename);
@@ -53,7 +48,7 @@ describe('loadEntry', () => {
       `
     );
 
-    const entry = loadEntry(metadata.filename);
+    const entry = EntryIO.load(metadata.filename);
     expect(entry).not.toBeNull();
     expect(entry.metadata).toEqual(metadata);
     expect(entry.metadata.tags).toBeUndefined();
@@ -80,11 +75,11 @@ describe('loadEntry', () => {
       `
     );
 
-    expect(() => loadEntry(metadata.filename)).toThrowError(FormatError);
+    expect(() => EntryIO.load(metadata.filename)).toThrowError(FormatError);
   });
 });
 
-describe('isValidEntryFormat', () => {
+describe('EntryIO.isValidFormat', () => {
   const metadata: MetaData = { date: '', filename: '', title: '' };
 
   it('accepts entry without a title line', () => {
@@ -96,7 +91,7 @@ describe('isValidEntryFormat', () => {
       Body text
     `;
 
-    expect(isValidEntryFormat(Buffer.from(text))).toBeTruthy();
+    expect(EntryIO.isValidFormat(Buffer.from(text))).toBeTruthy();
   });
 
   it('accepts entry with empty body', () => {
@@ -106,7 +101,7 @@ describe('isValidEntryFormat', () => {
       \`\`\`
     `;
 
-    expect(isValidEntryFormat(Buffer.from(text))).toBeTruthy();
+    expect(EntryIO.isValidFormat(Buffer.from(text))).toBeTruthy();
   });
 
   it('rejects non-title text before MetaData', () => {
@@ -120,12 +115,12 @@ describe('isValidEntryFormat', () => {
       body
     `;
 
-    expect(isValidEntryFormat(Buffer.from(text))).toBeFalsy();
+    expect(EntryIO.isValidFormat(Buffer.from(text))).toBeFalsy();
   });
 
   it('rejects broken metadata code frames', () => {
     expect(
-      isValidEntryFormat(
+      EntryIO.isValidFormat(
         Buffer.from(
           dedent`
             # Title
@@ -137,7 +132,7 @@ describe('isValidEntryFormat', () => {
     ).toBeFalsy();
 
     expect(
-      isValidEntryFormat(
+      EntryIO.isValidFormat(
         Buffer.from(
           dedent`
             # Title
@@ -149,7 +144,7 @@ describe('isValidEntryFormat', () => {
     ).toBeFalsy();
 
     expect(
-      isValidEntryFormat(
+      EntryIO.isValidFormat(
         Buffer.from(
           dedent`
             # Title
@@ -171,7 +166,7 @@ describe('isValidEntryFormat', () => {
       \`\`\`
     `;
 
-    expect(isValidEntryFormat(Buffer.from(text))).toBeFalsy();
+    expect(EntryIO.isValidFormat(Buffer.from(text))).toBeFalsy();
   });
 
   it('rejects title line that is not h1', () => {
@@ -183,11 +178,11 @@ describe('isValidEntryFormat', () => {
       \`\`\`
     `;
 
-    expect(isValidEntryFormat(Buffer.from(text))).toBeFalsy();
+    expect(EntryIO.isValidFormat(Buffer.from(text))).toBeFalsy();
   });
 });
 
-describe('extractMetaData', () => {
+describe('EntryIO.extractMetaData', () => {
   it('accepts wellformed json', () => {
     const text = dedent`
       \`\`\`json
@@ -199,7 +194,7 @@ describe('extractMetaData', () => {
       \`\`\`
     `;
 
-    expect(extractMetaData(Buffer.from(text))).toEqual({
+    expect(EntryIO.extractMetaData(Buffer.from(text))).toEqual({
       title: 'A good title',
       date: '1970-01-01T00:00:00Z',
       filename: '1970-01-01_Th_a_good_title.md',
@@ -223,7 +218,7 @@ describe('extractMetaData', () => {
       \`\`\`
     `;
 
-    expect(extractMetaData(Buffer.from(text))).toEqual({
+    expect(EntryIO.extractMetaData(Buffer.from(text))).toEqual({
       title: 'A good title',
       date: '1970-01-01T00:00:00Z',
       filename: '1970-01-01_Th_a_good_title.md',
@@ -231,7 +226,7 @@ describe('extractMetaData', () => {
   });
 
   it('throws FormatError for missing json', () => {
-    expect(() => extractMetaData(Buffer.from('No json!'))).toThrowError(
+    expect(() => EntryIO.extractMetaData(Buffer.from('No json!'))).toThrowError(
       FormatError
     );
   });
@@ -247,7 +242,9 @@ describe('extractMetaData', () => {
       \`\`\`
     `;
 
-    expect(() => extractMetaData(Buffer.from(text))).toThrowError(FormatError);
+    expect(() => EntryIO.extractMetaData(Buffer.from(text))).toThrowError(
+      FormatError
+    );
   });
 
   it('throws SyntaxError for malformed json', () => {
@@ -261,11 +258,13 @@ describe('extractMetaData', () => {
       \`\`\`
     `;
 
-    expect(() => extractMetaData(Buffer.from(text))).toThrowError(SyntaxError);
+    expect(() => EntryIO.extractMetaData(Buffer.from(text))).toThrowError(
+      SyntaxError
+    );
   });
 });
 
-describe('extractBodyText', () => {
+describe('EntryIO.extractBodyText', () => {
   it('trims leading whitespace', () => {
     const text = dedent`
       \`\`\`
@@ -276,17 +275,17 @@ describe('extractBodyText', () => {
 
       body`;
 
-    expect(extractBodyText(Buffer.from(text))).toEqual('body');
+    expect(EntryIO.extractBodyText(Buffer.from(text))).toEqual('body');
   });
 
   it('trims trailing whitespace', () => {
     const text = '```\nbody\n\n\n\n\n';
 
-    expect(extractBodyText(Buffer.from(text))).toEqual('body');
+    expect(EntryIO.extractBodyText(Buffer.from(text))).toEqual('body');
   });
 
   it('produces empty string for an empty body', () => {
-    expect(extractBodyText(Buffer.from('```'))).toEqual('');
+    expect(EntryIO.extractBodyText(Buffer.from('```'))).toEqual('');
   });
 
   it('only looks for first instance of /^```$/ to find start of body text', () => {
@@ -299,7 +298,7 @@ describe('extractBodyText', () => {
       \`\`\`
     `;
 
-    expect(extractBodyText(Buffer.from(text))).toEqual(
+    expect(EntryIO.extractBodyText(Buffer.from(text))).toEqual(
       text
         .split('\n')
         .slice(1)
@@ -310,6 +309,8 @@ describe('extractBodyText', () => {
   it('throws FormatError for text without a /^```$/ line', () => {
     const text = 'There is not starting code fence';
 
-    expect(() => extractBodyText(Buffer.from(text))).toThrowError(FormatError);
+    expect(() => EntryIO.extractBodyText(Buffer.from(text))).toThrowError(
+      FormatError
+    );
   });
 });
