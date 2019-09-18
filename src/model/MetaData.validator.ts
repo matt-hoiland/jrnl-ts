@@ -15,7 +15,7 @@ const schema = ajv.compile(require('./MetaData.json'));
  * The typeguard for the generated schema
  *
  * @param candidate the object to be type checked
- * @returns `true` if candidate is a valid instance of MetaData,
+ * @return `true` if candidate is a valid instance of MetaData,
  *   `false` otherwise
  */
 export function isValidMetaData(candidate: any): candidate is MetaData {
