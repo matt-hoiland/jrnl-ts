@@ -61,7 +61,7 @@ for (const schema of schemas) {
        * The typeguard for the generated schema
        *
        * @param candidate the object to be type checked
-       * @return \`true\` if candidate is a valid instance of ${basename},
+       * @returns \`true\` if candidate is a valid instance of ${basename},
        *   \`false\` otherwise
        */
       export function isValid${basename}(candidate: any): candidate is ${basename} {
