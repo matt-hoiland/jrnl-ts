@@ -12,7 +12,7 @@ export class Entry {
   constructor(public metadata: MetaData, public text: string) {}
 
   /**
-   *
+   * Generate the text of a standard journal entry as defined in docs/Entries.md
    */
   toString(): string {
     // Not dedented because of JSON stringification
