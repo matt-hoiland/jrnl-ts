@@ -10,4 +10,19 @@ export class Entry {
    *   MetaData code fence with leading and trailing whitespace trimmed.
    */
   constructor(public metadata: MetaData, public text: string) {}
+
+  /**
+   *
+   */
+  toString(): string {
+    // Not dedented because of JSON stringification
+    return `# ${this.metadata.title}
+
+\`\`\`json
+${JSON.stringify(this.metadata, undefined, 2)}
+\`\`\`
+
+${this.text}
+`;
+  }
 }

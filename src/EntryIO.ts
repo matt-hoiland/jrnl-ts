@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import * as path from 'path';
 import { isBinaryFileSync } from 'isbinaryfile';
 
 import {
@@ -42,14 +43,24 @@ export class EntryIO {
    * Optionally specify a target directory.
    *
    * @param entry The entry to be saved
-   * @param path the path-like string pointing to the directory to be saved.
+   * @param dir the path-like string pointing to the directory to be saved.
    * @throws [[InvalidFileTypeError]] if `path` does not point to a directory
    *   (including if the path doesn't exist)
    * @throws [[FormatError]] if `entry.metadata` does not conform to schema
    *   [[isValidMetaData]]
    */
-  static save(entry: Entry, path = '.'): void {
-    throw new NotImplementedError('EntryIO.save');
+  static save(entry: Entry, dir = '.'): void {
+    if (!fs.existsSync(dir)) {
+      throw new InvalidFileTypeError(`Path ${dir} does not exist`);
+    }
+    if (!fs.statSync(dir).isDirectory()) {
+      throw new InvalidFileTypeError(`${dir} is not a directory`);
+    }
+    if (!isValidMetaData(entry.metadata)) {
+      throw new FormatError(`Entry contains corrupted metadata`);
+    }
+
+    fs.writeFileSync(path.join(dir, entry.metadata.filename), entry.toString());
   }
 
   /**
