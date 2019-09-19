@@ -1,4 +1,5 @@
 import * as fs from 'fs';
+import * as path from 'path';
 import * as dedent from 'dedent';
 
 import { EntryIO } from './EntryIO';
@@ -76,6 +77,109 @@ describe('EntryIO.load', () => {
     );
 
     expect(() => EntryIO.load(metadata.filename)).toThrowError(FormatError);
+  });
+});
+
+describe('EntryIO.save', () => {
+  const goodEntry = new Entry(
+    {
+      date: '1970-01-01T00:00:00Z',
+      filename: '1970-01-01_Th_entry.md',
+      title: 'Entry',
+    },
+    'Body text'
+  );
+
+  const badEntry = new Entry(
+    {
+      date: '1970-01-01',
+      filename: '1970-01-01_Th_Entry.md',
+      title: 'Entry',
+    },
+    'Body text'
+  );
+
+  const testdir = 'test';
+  const nontrivialPath = path.join(testdir);
+  const nondirectoryFile = path.join(nontrivialPath, 'blah.txt');
+  const nonexistentPath = './non/existent/path';
+
+  beforeAll(() => {
+    fs.mkdirSync(nontrivialPath, { recursive: true });
+    fs.writeFileSync(nondirectoryFile, nondirectoryFile);
+  });
+
+  afterAll(() => {
+    fs.unlinkSync(nondirectoryFile);
+    fs.unlinkSync(goodEntry.metadata.filename);
+    fs.unlinkSync(path.join(nontrivialPath, goodEntry.metadata.filename));
+    fs.rmdirSync(testdir);
+  });
+
+  it('accepts correct data on default path', () => {
+    expect(() => EntryIO.save(goodEntry)).not.toThrow();
+    expect(
+      fs.readFileSync(goodEntry.metadata.filename).toString('utf-8')
+    ).toEqual(
+      // Specifically *not* dedented due to whitespace trimming
+      `# Entry
+
+\`\`\`json
+{
+  "date": "1970-01-01T00:00:00Z",
+  "filename": "1970-01-01_Th_entry.md",
+  "title": "Entry"
+}
+\`\`\`
+
+Body text
+`
+    );
+  });
+
+  it('accepts correct data on non-trivial path', () => {
+    expect(() => EntryIO.save(goodEntry, nontrivialPath)).not.toThrow();
+    expect(
+      fs
+        .readFileSync(path.join(nontrivialPath, goodEntry.metadata.filename))
+        .toString('utf-8')
+    ).toEqual(
+      // Specifically *not* dedented due to whitespace trimming
+      `# Entry
+
+\`\`\`json
+{
+  "date": "1970-01-01T00:00:00Z",
+  "filename": "1970-01-01_Th_entry.md",
+  "title": "Entry"
+}
+\`\`\`
+
+Body text
+`
+    );
+  });
+
+  it('rejects correct data on non-existent path', () => {
+    expect(() => EntryIO.save(goodEntry, nonexistentPath)).toThrowError(
+      InvalidFileTypeError
+    );
+  });
+
+  it('rejects correct data on non-directory file', () => {
+    expect(() => EntryIO.save(goodEntry, nondirectoryFile)).toThrowError(
+      InvalidFileTypeError
+    );
+  });
+
+  it('rejects bad data on default path', () => {
+    expect(() => EntryIO.save(badEntry)).toThrowError(FormatError);
+  });
+
+  it('rejects bad data on non-trivial path', () => {
+    expect(() => EntryIO.save(badEntry, nontrivialPath)).toThrowError(
+      FormatError
+    );
   });
 });
 
