@@ -2,11 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { isBinaryFileSync } from 'isbinaryfile';
 
-import {
-  FormatError,
-  InvalidFileTypeError,
-  NotImplementedError,
-} from './errors';
+import { FormatError, InvalidFileTypeError } from './errors';
 import { Entry } from './model/Entry';
 import { MetaData } from './model/MetaData';
 import { isValidMetaData } from './model/MetaData.validator';
