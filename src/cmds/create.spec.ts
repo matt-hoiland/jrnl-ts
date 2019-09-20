@@ -3,12 +3,10 @@
  *
  * @author Matt Hoiland
  * @date 2019-09-20
- * @linces GPL-3.0
+ * @license GPL-3.0
  */
 
- /**
-  * `create.handler` tests
-  */
-describe('create.hanlder', () => {
-
-});
+/**
+ * `create.handler` tests
+ */
+describe('create.hanlder', () => {});
