@@ -6,7 +6,6 @@ import { FormatError, InvalidFileTypeError } from './errors';
 import { Entry } from './model/Entry';
 import { MetaData } from './model/MetaData';
 import { isValidMetaData } from './model/MetaData.validator';
-import { trimr } from './utils';
 
 /**
  * Entry read & write operations as well as some siple format validation
@@ -206,7 +205,7 @@ export class EntryIO {
     data: Buffer
   ): [string, string[], number, number] {
     const text = data.toString('utf-8');
-    const lines = text.split('\n').map(trimr);
+    const lines = text.split('\n').map(line => line.trimRight());
 
     const mdStart = lines.findIndex(line => line.match(/^\`\`\`json$/));
     const mdEnd = lines.findIndex(line => line.match(/^\`\`\`$/));
