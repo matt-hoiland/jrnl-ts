@@ -6,9 +6,6 @@
  * @license GPL-3.0
  */
 
-/** Imports */
-import { NotImplementedError } from './errors';
-
 /**
  * Takes any single line string and produces a valid title part for the
  * `filename` property of [[MetaData]]. Performs the following actions:
@@ -37,5 +34,16 @@ export function simplifyTitle(
   title: string,
   maxLength: number | false = 32
 ): string {
-  throw new NotImplementedError('simplifyTitle');
+  return title
+    .split(/\s+/)
+    .map(s => s.toLowerCase().replace(/\W/g, ''))
+    .filter(s => s.length > 0)
+    .filter((s, i, a) => {
+      return (
+        maxLength === false ||
+        maxLength < 0 ||
+        a.slice(0, i).join('_').length + s.length + 1 <= maxLength
+      );
+    })
+    .join('_');
 }
