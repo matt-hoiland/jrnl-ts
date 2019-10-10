@@ -1,3 +1,13 @@
+/**
+ * Copies all type declaration and JSON-defined object files to the output
+ * directory.
+ *
+ * @author Matt Hoiland
+ * @date 2019-09-01
+ * @license GPL-3.0
+ */
+
+/** Imports */
 import * as fs from 'fs';
 import * as path from 'path';
 
