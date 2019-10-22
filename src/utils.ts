@@ -47,3 +47,16 @@ export function simplifyTitle(
     })
     .join('_');
 }
+
+/**
+ * Given a JS `Date` object, it gives the ISO formatted string in the
+ * computer's timezone. If the computer's timezone is set to UTC, then give
+ * JS's native `Date.prototype.toISOString()`
+ *
+ * @param date the date to be formatted
+ *
+ * @returns locally formated date
+ */
+export function toLocalISOString(date: Date): string {
+  return '';
+}
