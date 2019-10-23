@@ -81,3 +81,8 @@ export function toLocalISOString(date: Date): string {
     `T${hours}:${minutes}:${seconds}.${millis}${tzStr}`
   );
 }
+
+/**
+ * Days of the week
+ */
+export const DAY_NAMES = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];

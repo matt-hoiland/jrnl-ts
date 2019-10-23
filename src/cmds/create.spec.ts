@@ -15,7 +15,7 @@ import { handler } from './create';
 /**
  * `create.handler` tests
  */
-describe('create.hanlder', () => {
+describe('create.handler', () => {
   it('creates a new entry given correct input', () => {
     const args: Args = {
       $0: 'jrnl',
