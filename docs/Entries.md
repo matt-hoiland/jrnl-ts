@@ -13,6 +13,16 @@ The base unit of the journal is the `Entry`. The entry has the following format:
 
 where `{MetaData}` is defined in [MetaData.json](../src/model/MetaData.json) and `{Markdown}` is simply [github flavored markdown](https://github.github.com/gfm/).
 
+### Example:
+
+```markdown
+# A Journal Entry
+
+{MetaData}
+
+Body content
+```
+
 ## File name format
 
 The file name for an entry can be build directly from its metadata:
@@ -25,6 +35,8 @@ The file name for an entry can be build directly from its metadata:
 ```
 
 where `{MetaData.date.slice(0,10)}` corresponds to only the `YYYY-MM-DD` portion of the date, and `{MetaData.title | simplifier}` is the title field piped through a simplifier function to be defined as later (to make sure the file name is in agreement with file system naming rules). Redundantly, the file name is stored in the `MetaData`.
+
+Example: `1970-01-01_Th_a_journal_entry.md`
 
 ### File name regex
 
