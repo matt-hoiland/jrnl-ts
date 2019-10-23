@@ -12,9 +12,12 @@
  */
 
 /** Imports */
+import * as fs from 'fs';
+import * as path from 'path';
+import * as utils from '../utils';
 import { Argv, Args } from '../common.d';
 import { Entry } from '../model/Entry';
-import { NotImplementedError } from '../errors';
+import { EntryIO } from '../EntryIO';
 
 /**
  * Usage string for the command
@@ -52,7 +55,29 @@ export function builder(yargs: Argv): Argv {
  * @param argv The parsed arguments where `$0` is the program name, `_` is the
  *   executed command, and all other keys are arguments and their aliases.
  */
-export function handler(argv: Args): Entry {
-  console.dir(argv);
-  throw new NotImplementedError('create.handler');
+export function handler(argv: Args): Entry | null {
+  if (typeof argv.title !== 'string') {
+    return null;
+  }
+  if (typeof argv.path !== 'string') {
+    return null;
+  }
+
+  const jsdate = new Date();
+  const date = utils.toLocalISOString(jsdate);
+  const title = argv.title;
+  const filename =
+    [
+      date.split('T')[0],
+      utils.DAY_NAMES[jsdate.getDay()],
+      utils.simplifyTitle(title),
+    ].join('_') + '.md';
+
+  if (fs.existsSync(path.join(argv.path, filename))) {
+    return null;
+  }
+
+  const entry = new Entry({ date, filename, title }, '');
+  EntryIO.save(entry, argv.path as string);
+  return entry;
 }
