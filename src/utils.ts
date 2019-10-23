@@ -47,3 +47,37 @@ export function simplifyTitle(
     })
     .join('_');
 }
+
+/**
+ * Given a JS `Date` object, it gives the ISO formatted string in the
+ * computer's timezone. If the computer's timezone is set to UTC, then give
+ * JS's native `Date.prototype.toISOString()`
+ *
+ * @param date the date to be formatted
+ * @returns locally formated date
+ */
+export function toLocalISOString(date: Date): string {
+  const zpad = (n: number, l = 2) => n.toString(10).padStart(l, '0');
+
+  if (date.getTimezoneOffset() === 0) {
+    return date.toISOString();
+  }
+  const tz = date.getTimezoneOffset();
+  const [tzHours, tzMins] = [Math.floor(tz / 60), tz % 60];
+  const tzStr = `${tz < 0 ? '+' : '-'}${zpad(tzHours)}:${zpad(tzMins)}`;
+
+  const [year, month, day, hours, minutes, seconds, millis] = [
+    zpad(date.getFullYear(), 4),
+    zpad(date.getMonth() + 1), // Only *this* one is zero based
+    zpad(date.getDate()),
+    zpad(date.getHours()),
+    zpad(date.getMinutes()),
+    zpad(date.getSeconds()),
+    zpad(date.getMilliseconds(), 3),
+  ];
+
+  return (
+    `${year}-${month}-${day}` +
+    `T${hours}:${minutes}:${seconds}.${millis}${tzStr}`
+  );
+}
