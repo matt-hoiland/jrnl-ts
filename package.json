@@ -1,6 +1,6 @@
 {
   "name": "jrnl",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "A CLI for managing my personal markdown-based journal",
   "main": "bin/src/index.js",
   "types": "bin/src/index.d.ts",
